@@ -1,6 +1,6 @@
 const BINDS = Symbol()
 
-export function fixBind (target, property, descriptor) {
+export default function fixBind (target, property, descriptor) {
   if (!property && !descriptor) return fixBindInstance(target)
   return fixBindDecorator(target, property, descriptor)
 }
