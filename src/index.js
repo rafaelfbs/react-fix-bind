@@ -2,7 +2,7 @@ const BINDS = Symbol()
 
 export default function fixBind (target, property, descriptor) {
   if (!property && !descriptor) return fixBindInstance(target)
-  return fixBindDecorator(target, property, descriptor)
+  return fixBindMaybeCalledDecorator(target, property, descriptor)
 }
 
 function fixBindInstance (target) {
@@ -10,17 +10,40 @@ function fixBindInstance (target) {
 
   if (!klass[BINDS]) return;
   klass[BINDS].forEach(bind => {
-    delete target[bind]
+    delete target[bind.property]
   })
 }
 
-function fixBindDecorator (target, property, descriptor) {
+function fixBindMaybeCalledDecorator (options, property, descriptor) {
+  if (arguments.length === 1)
+    return (target, property, descriptor) => fixBindDecorator(target, property, descriptor, options)
+  return fixBindDecorator(options, property, descriptor, {})
+}
+
+function fixBindDecorator (target, property, descriptor, options) {
   const klass = target.constructor
 
   if (!klass[BINDS]) {
     klass[BINDS] = []
   }
 
-  klass[BINDS].push(property)
-}
+  klass[BINDS].push({
+    property,
+    options
+  })
 
+  if (options.autobind) {
+    const { enumerable, configurable = true, writable = true } = descriptor || {}
+    const method = target[property]
+
+    return {
+      enumerable,
+      configurable: true,
+      get: function() {
+        const boundMethod = method.bind(this)
+        Object.defineProperty({ enumerable, configurable, value: boundMethod })
+        return boundMethod
+      }
+    }
+  }
+}
