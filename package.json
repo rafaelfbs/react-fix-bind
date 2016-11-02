@@ -1,6 +1,6 @@
 {
   "name": "react-fix-binds",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Fix React autobind using class components",
   "main": "lib/index.js",
   "scripts": {

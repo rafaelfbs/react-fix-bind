@@ -15,7 +15,7 @@ function fixBindInstance (target) {
 }
 
 function fixBindMaybeCalledDecorator (options, property, descriptor) {
-  if (arguments.length === 1)
+  if (!property && !descriptor)
     return (target, property, descriptor) => fixBindDecorator(target, property, descriptor, options)
   return fixBindDecorator(options, property, descriptor, {})
 }
