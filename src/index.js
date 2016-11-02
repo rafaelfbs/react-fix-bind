@@ -1,7 +1,7 @@
 const BINDS = Symbol()
 
 export default function fixBind (target, property, descriptor) {
-  if (!property && !descriptor) return fixBindInstance(target)
+  if (!property && !descriptor && target.constructor !== Object) return fixBindInstance(target)
   return fixBindMaybeCalledDecorator(target, property, descriptor)
 }
 
